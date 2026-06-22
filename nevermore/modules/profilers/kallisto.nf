@@ -12,7 +12,7 @@ process kallisto_index {
 	"""
 	mkdir -p kallisto/index/${sample.id}/
 
-	kallisto index -i kallisto/index/${sample.id}.${index_name}.idx ${genes}
+	kallisto index --make-unique -i kallisto/index/${sample.id}.${index_name}.idx ${genes}
 	"""
 	
 }

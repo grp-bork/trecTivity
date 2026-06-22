@@ -19,7 +19,7 @@ process cd_hit_est {
 
 	cat ${fastas} > seqs.ffn
 
-	cd-hit-est --make-unique -T ${task.cpus} -M ${mem} -i seqs.ffn -o ${sample.id}.cdhit -c 0.95 -n 11 -s 0.90 -d 0 -g 1 -G 1
+	cd-hit-est -T ${task.cpus} -M ${mem} -i seqs.ffn -o ${sample.id}.cdhit -c 0.95 -n 11 -s 0.90 -d 0 -g 1 -G 1
 
 	gzip -c ${sample.id}.cdhit > ${sample.id}/${sample.id}.reduced.ffn.gz
 
