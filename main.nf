@@ -140,6 +140,21 @@ workflow {
 		)
 
 		downstream_fq_ch = prep_samples_ch.map { meta, source, reads, contigs, genes -> [ meta, reads ] }
+
+		if (params.run_gffquant) {
+			gq_input_ch = nevermore_main.out.fastqs
+				.map { sample, fastqs ->
+				sample_id = sample.id.replaceAll(/.(orphans|singles|chimeras)$/, "")
+				return tuple(sample_id, [fastqs].flatten())
+			}
+			.groupTuple()
+			.map { sample_id, fastqs -> return tuple(sample_id, [fastqs].flatten()) }
+		
+			gq_input_ch.dump(pretty: true, tag: "gq_input_ch")
+		
+			gffquant_flow(gq_input_ch)
+		}
+
 		
 		// motus(nevermore_main.out.fastqs, params.motus_db)
 		// motus_merge(
