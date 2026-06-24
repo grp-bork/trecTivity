@@ -66,7 +66,7 @@ workflow assembly {
 						}
 				)
 				.mix(
-					extract_stringtie_transcripts.out.transcripts,
+					extract_stringtie_transcripts.out.transcripts
 						.map { sample, contigs -> 
 							def meta = sample.clone()
 							meta.assembler = "stringtie"
