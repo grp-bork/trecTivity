@@ -24,6 +24,8 @@ include { quast } from "./trectivity/modules/assembly/quast"
 include { align_to_reference } from "./trectivity/workflows/refalign"
 include { handle_input } from "./trectivity/workflows/input"
 
+include { assembly } from "./trectivity/workflows/assembly"
+
 
 if (params.input_dir && params.remote_input_dir) {
 	log.info """
