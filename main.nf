@@ -11,18 +11,18 @@ include { kallisto_index; kallisto_quant} from "./nevermore/modules/profilers/ka
 include { qc_bbmerge_insert_size } from "./nevermore/modules/qc/bbmerge"
 include { hisat2_build; hisat2_align } from "./nevermore/modules/align/hisat2"
 include { merge_and_sort } from "./nevermore/modules/align/helpers"
-include { stringtie; extract_stringtie_transcripts } from "./metatrec/modules/assembly/stringtie"
-include { picard_insert_size } from "./metatrec/modules/qc/picard"
-include { samtools_coverage} from "./metatrec/modules/qc/samtools"
+include { stringtie; extract_stringtie_transcripts } from "./trectivity/modules/assembly/stringtie"
+include { picard_insert_size } from "./trectivity/modules/qc/picard"
+include { samtools_coverage} from "./trectivity/modules/qc/samtools"
 include { bowtie2_build; bowtie2_align } from "./nevermore/modules/align/bowtie2"
 // include { motus; motus_merge } from "./nevermore/modules/profilers/motus"
-include { metaT_megahit; bwa_index; bwa2assembly } from "./metatrec/modules/assembly/megahit"
-include { metaT_trinity } from "./metatrec/modules/assembly/trinity"
-include { cd_hit_est } from "./metatrec/modules/assembly/cdhit"
-include { quast } from "./metatrec/modules/assembly/quast"
+include { metaT_megahit; bwa_index; bwa2assembly } from "./trectivity/modules/assembly/megahit"
+include { metaT_trinity } from "./trectivity/modules/assembly/trinity"
+include { cd_hit_est } from "./trectivity/modules/assembly/cdhit"
+include { quast } from "./trectivity/modules/assembly/quast"
 
-include { align_to_reference } from "./metatrec/workflows/refalign"
-include { handle_input } from "./metatrec/workflows/input"
+include { align_to_reference } from "./trectivity/workflows/refalign"
+include { handle_input } from "./trectivity/workflows/input"
 
 
 if (params.input_dir && params.remote_input_dir) {
