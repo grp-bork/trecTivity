@@ -111,20 +111,20 @@ workflow {
 		prep_samples_ch.dump(pretty: true, tag: "prep_samples_ch")
 
 		align_to_reference(prep_samples_ch)
-		
-		stringtie(align_to_reference.out.alignments)
-
-		extract_stringtie_transcripts(
-			stringtie.out.gtf
-				.map { sample, gtf -> [ sample.id, sample, gtf ] }
-				.join(
-					prep_samples_ch.map { sample -> [sample[0].id, sample[3] ] },
-					by: 0
-				)
-				.map { sample_id, sample, gtf, genome_fasta -> [ sample, gtf, genome_fasta ] }
-		)
-
 		align_to_reference.out.alignments.dump(pretty: true, tag: "align_to_reference_out")
+		
+		// stringtie(align_to_reference.out.alignments)
+
+		// extract_stringtie_transcripts(
+		// 	stringtie.out.gtf
+		// 		.map { sample, gtf -> [ sample.id, sample, gtf ] }
+		// 		.join(
+		// 			prep_samples_ch.map { sample -> [sample[0].id, sample[3] ] },
+		// 			by: 0
+		// 		)
+		// 		.map { sample_id, sample, gtf, genome_fasta -> [ sample, gtf, genome_fasta ] }
+		// )
+
 
 		picard_insert_size(
 			align_to_reference.out.alignments
@@ -138,8 +138,6 @@ workflow {
 				.map { sample, file -> file }
 				.collect()
 		)
-
-		downstream_fq_ch = prep_samples_ch.map { meta, source, reads, contigs, genes -> [ meta, reads ] }
 
 		if (params.run_gffquant) {
 			gq_input_ch = nevermore_main.out.fastqs
@@ -155,7 +153,12 @@ workflow {
 			gffquant_flow(gq_input_ch)
 		}
 
-		
+		assembly(
+			prep_samples_ch,
+			align_to_reference.out.alignments
+		)
+		// downstream_fq_ch = prep_samples_ch.map { meta, source, reads, contigs, genes -> [ meta, reads ] }
+
 		// motus(nevermore_main.out.fastqs, params.motus_db)
 		// motus_merge(
 		// 	motus.out.motus_profile
@@ -164,73 +167,74 @@ workflow {
 		// 	params.motus_db
 		// )
 
-		assembly_input_ch = downstream_fq_ch
-			.map { sample, fastqs -> 
-				def meta = sample.clone()
-				meta.id = meta.id.replaceAll(/\.(singles|orphans)$/, "")
-				return [ meta.id, meta.sample_id, fastqs ]
-			}
-			.groupTuple(by: [0, 1], size: 2, remainder: true)
-			.map { sample_protocol_id, sample_id, fastqs -> 
-				def meta = [:]
-				meta.id = sample_protocol_id
-				meta.sample_id = sample_id
-				return [ meta, [fastqs].flatten() ]
-			}
+		// assembly_input_ch = downstream_fq_ch
+		// 	.map { sample, fastqs -> 
+		// 		def meta = sample.clone()
+		// 		meta.id = meta.id.replaceAll(/\.(singles|orphans)$/, "")
+		// 		return [ meta.id, meta.sample_id, fastqs ]
+		// 	}
+		// 	.groupTuple(by: [0, 1], size: 2, remainder: true)
+		// 	.map { sample_protocol_id, sample_id, fastqs -> 
+		// 		def meta = [:]
+		// 		meta.id = sample_protocol_id
+		// 		meta.sample_id = sample_id
+		// 		return [ meta, [fastqs].flatten() ]
+		// 	}
 
-		assembly_input_ch.dump(pretty: true, tag: "assembly_input_ch")
+		// assembly_input_ch.dump(pretty: true, tag: "assembly_input_ch")
 
-		metaT_megahit(assembly_input_ch, "stage1")
+		// metaT_megahit(assembly_input_ch, "stage1")
 
-		metaT_trinity(assembly_input_ch, "stage1")
+		// metaT_trinity(assembly_input_ch, "stage1")
 
-		quast(metaT_megahit.out.contigs.mix(metaT_trinity.out.contigs))
+		// quast(metaT_megahit.out.contigs.mix(metaT_trinity.out.contigs))
 
-		cd_hit_est(
-			metaT_megahit.out.contigs
-				.mix(metaT_trinity.out.contigs)
-				.mix(extract_stringtie_transcripts.out.transcripts)
-				.map { sample, file -> [ sample.id, sample, file ] }
-				.groupTuple(by: 0, size: 3)
-				.map { sample_id, sample, files -> [ sample[0], files ] }
-		)
+		// cd_hit_est(
+		// 	metaT_megahit.out.contigs
+		// 		.mix(metaT_trinity.out.contigs)
+		// 		.mix(extract_stringtie_transcripts.out.transcripts)
+		// 		.map { sample, file -> [ sample.id, sample, file ] }
+		// 		.groupTuple(by: 0, size: 3)
+		// 		.map { sample_id, sample, files -> [ sample[0], files ] }
+		// )
 
 		kallisto_flow(
 			genes_ch
 				.map { sample, fasta -> [ sample, "metaG", fasta ] }			
 				.mix(
-					cd_hit_est.out.contigs.map { sample, fasta -> [ sample, "assembled", fasta ] }
+					// cd_hit_est.out.contigs.map { sample, fasta -> [ sample, "assembled", fasta ] }
+					assembly.out.contigs.map { sample, fasta -> [ sample, "assembled", fasta ] }
 				),
 			fastq_ch
 		)
 
-		bwa_index(
-			metaT_megahit.out.contigs
-				.map { sample, contigs -> 
-					def meta = sample.clone()
-					sample.assembler = "megahit"
-					return [ sample, contigs ]
-				}
-				.mix(
-					metaT_trinity.out.contigs
-						.map { sample, contigs -> 
-							def meta = sample.clone()
-							meta.assembler = "trinity"
-							return [ sample, contigs ]
-						}
-				)		
-		)
+		// bwa_index(
+		// 	metaT_megahit.out.contigs
+		// 		.map { sample, contigs -> 
+		// 			def meta = sample.clone()
+		// 			sample.assembler = "megahit"
+		// 			return [ sample, contigs ]
+		// 		}
+		// 		.mix(
+		// 			metaT_trinity.out.contigs
+		// 				.map { sample, contigs -> 
+		// 					def meta = sample.clone()
+		// 					meta.assembler = "trinity"
+		// 					return [ sample, contigs ]
+		// 				}
+		// 		)		
+		// )
 
-		bwa2assembly(
-			downstream_fq_ch
-				.map { sample, fastqs -> [ sample.id.replaceAll(/\.singles$/, ""), sample, fastqs ] }
-				.combine(bwa_index.out.index, by: 0)
-				.map { sample_id, sample, fastqs, index -> 
-					def meta = sample.clone()
-					meta.index_id = sample_id
-					return [ meta, fastqs, index ]
-				}
-		)
+		// bwa2assembly(
+		// 	downstream_fq_ch
+		// 		.map { sample, fastqs -> [ sample.id.replaceAll(/\.singles$/, ""), sample, fastqs ] }
+		// 		.combine(bwa_index.out.index, by: 0)
+		// 		.map { sample_id, sample, fastqs, index -> 
+		// 			def meta = sample.clone()
+		// 			meta.index_id = sample_id
+		// 			return [ meta, fastqs, index ]
+		// 		}
+		// )
 
 		if (do_preprocessing && params.run_qa) {
 			collate_stats(counts_ch.collect())		
