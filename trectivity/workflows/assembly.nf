@@ -1,3 +1,10 @@
+include { stringtie; extract_stringtie_transcripts } from "../modules/assembly/stringtie"
+include { metaT_megahit; bwa_index; bwa2assembly } from "../modules/assembly/megahit"
+include { metaT_trinity } from "../modules/assembly/trinity"
+include { cd_hit_est } from "../modules/assembly/cdhit"
+include { quast } from "../modules/assembly/quast"
+
+
 workflow assembly {
 	take:
 		prep_samples_ch
