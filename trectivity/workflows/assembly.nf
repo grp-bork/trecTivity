@@ -57,30 +57,29 @@ workflow assembly {
 				.map { sample_id, sample, files -> [ sample[0], files ] }
 		)
 
-		bwa_index(
-			metaT_megahit.out.contigs
-				.map { sample, contigs -> 
-					def meta = sample.clone()
-					sample.assembler = "megahit"
-					return [ sample, contigs ]
-				}
-				.mix(
-					metaT_trinity.out.contigs
-						.map { sample, contigs -> 
-							def meta = sample.clone()
-							meta.assembler = "trinity"
-							return [ sample, contigs ]
-						}
-				)
-				.mix(
-					extract_stringtie_transcripts.out.transcripts
-						.map { sample, contigs -> 
-							def meta = sample.clone()
-							meta.assembler = "stringtie"
-							return [ sample, contigs ]
-						}
-				)
-		)
+		bwa_index(cd_hit_est.out.contigs)
+			// metaT_megahit.out.contigs
+			// 	.map { sample, contigs ->
+			// 		def meta = sample.clone()
+			// 		sample.assembler = "megahit"
+			// 		return [ sample, contigs ]
+			// 	}
+			// 	.mix(
+			// 		metaT_trinity.out.contigs
+			// 			.map { sample, contigs ->
+			// 				def meta = sample.clone()
+			// 				meta.assembler = "trinity"
+			// 				return [ sample, contigs ]
+			// 			}
+			// 	)
+			// 	.mix(
+			// 		extract_stringtie_transcripts.out.transcripts
+			// 			.map { sample, contigs ->
+			// 				def meta = sample.clone()
+			// 				meta.assembler = "stringtie"
+			// 				return [ sample, contigs ]
+			// 			}
+			// 	)
 
 		bwa2assembly(
 			downstream_fq_ch
