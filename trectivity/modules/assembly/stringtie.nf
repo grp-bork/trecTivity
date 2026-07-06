@@ -17,7 +17,8 @@ process stringtie {
 }
 
 process extract_stringtie_transcripts {
-	container "quay.io/biocontainers/bedtools:2.31.1--h13024bc_3"
+	// container "quay.io/biocontainers/bedtools:2.31.1--h13024bc_3"
+	container "quay.io/biocontainers/gffread:0.12.9--hf426362_0"
 	tag "${sample.id}"
 
 	input:
@@ -36,9 +37,11 @@ process extract_stringtie_transcripts {
 		ln -s ${fasta} genome.fa
 	fi
 
-	awk -v OFS='\\t' '/^#/ { print \$0; next } \$3 == "transcript" { print \$0; }' ${gtf} > transcripts.gtf
+	# awk -v OFS='\\t' '/^#/ { print \$0; next } \$3 == "transcript" { print \$0; }' ${gtf} > transcripts.gtf
 
-	bedtools getfasta -fi genome.fa -bed transcripts.gtf -fullHeader -fo ${sample.id}/stringtie/${sample.id}.stringtie.ffn
+	# bedtools getfasta -fi genome.fa -bed transcripts.gtf -fullHeader -fo ${sample.id}/stringtie/${sample.id}.stringtie.ffn
+
+	gffread -g genome.fa -W -u ${sample.id}/stringtie/${sample.id}.stringtie.full.ffn -w ${sample.id}/stringtie/${sample.id}.stringtie.ffn -o ${sample.id}/stringtie/${sample.id}.stringtie.gff ${gtf}
 
 	rm -vf genome.fa transcripts.gtf
 	"""
