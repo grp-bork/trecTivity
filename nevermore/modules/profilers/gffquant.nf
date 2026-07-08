@@ -15,8 +15,7 @@ process stream_gffquant {
 	label "large"
 
 	input:
-		tuple val(sample), path(fastqs)
-		path(gq_db)
+		tuple val(sample), path(fastqs), path(gq_db)
 
 	output:
 		tuple val(sample), path("${sample}/*.{txt.gz,pd.txt}"), emit: results

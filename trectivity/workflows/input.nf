@@ -8,7 +8,7 @@ workflow handle_input {
 		if (params.samplesheet) {
 			samples_ch = Channel
 				.fromPath(params.samplesheet)
-				.splitCsv(sep: '\t', header: [ "id", "source", "r1", "r2", "singles", "contigs", "genes" ])
+				.splitCsv(sep: '\t', header: [ "id", "source", "biome", "r1", "r2", "singles", "contigs", "genes" ])
 				.map { row -> 
 					def meta = [:]
 					meta.id = row.id
