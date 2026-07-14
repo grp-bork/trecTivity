@@ -26,6 +26,7 @@ include { handle_input } from "./trectivity/workflows/input"
 
 include { assembly } from "./trectivity/workflows/assembly"
 
+include { motus3; motus4 } from "./trectivity/modules/profilers/motus"
 
 if (params.input_dir && params.remote_input_dir) {
 	log.info """
@@ -166,6 +167,18 @@ workflow {
 			align_to_reference.out.alignments
 		)
 		
+		if (params.run_motus) {
+			def run_motus3 = (params.run_motus == "motus3" || params.run_motus == "both")
+			def run_motus4 = (params.run_motus == "motus4" || params.run_motus == "both")
+			if (run_motus3) {
+				motus3(nevermore_main.out.fastqs, params.motus3_db)
+			} 
+			if (run_motus4) {
+				motus4(nevermore_main.out.fastqs, params.motus4_db)
+			}
+
+		}
+
 		// motus(nevermore_main.out.fastqs, params.motus_db)
 		// motus_merge(
 		// 	motus.out.motus_profile
