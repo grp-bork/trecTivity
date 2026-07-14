@@ -154,7 +154,8 @@ workflow {
 				prep_samples_ch.map { it -> [ it[0].id, it ] }, by: 0
 			)
 			// .map { sample_id, fastqs, _sample, _source, _reads, _contigs, _genes, biome -> [ sample_id, fastqs, file("${params.gq_db}/${biome}/${biome}.mmi") ] }
-			.map { sample_id, fastqs, sample_meta, _source, _reads, _contigs, _genes -> [ sample_id, fastqs, "${params.gq_db}/${sample_meta.biome}/${sample_meta.biome}.mmi" ] }
+			// .map { sample_id, fastqs, sample_meta, _source, _reads, _contigs, _genes -> [ sample_id, fastqs, "${params.gq_db}/${sample_meta.biome}/${sample_meta.biome}.mmi" ] }
+			.map { sample_id, fastqs, sample_meta -> [ sample_id, fastqs, "${params.gq_db}/${sample_meta[0].biome}/${sample_meta[0].biome}.mmi" ] }
 			
 			gq_input_ch.dump(pretty: true, tag: "gq_input_ch")
 		
@@ -163,7 +164,7 @@ workflow {
 
 		assembly(
 			// [ sample_prep, sample_meta[1], reads, sample_meta[3], sample_meta[4], sample_meta[2] ]
-			prep_samples_ch.map { sample, source, reads, contigs, genes -> [ sample, source, reads, contigs, genes ] },
+			prep_samples_ch //.map { sample, source, reads, contigs, genes -> [ sample, source, reads, contigs, genes ] },
 			align_to_reference.out.alignments
 		)
 		
