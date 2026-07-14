@@ -107,8 +107,21 @@ workflow {
 				by: 0
 			)
 			.map { sample_id, sample_meta, sample_prep, reads ->
-				return [ sample_prep, sample_meta[1], reads, sample_meta[3], sample_meta[4], sample_meta[2] ]
+				// return [ sample_prep, sample_meta[1], reads, sample_meta[3], sample_meta[4], sample_meta[2] ]
+				return [ sample_prep, sample_meta[1], reads, sample_meta[3], sample_meta[4] ]
 			}
+
+		// meta, source, reads, contigs, genes
+		// [ "id", "source", "biome", "r1", "r2", "singles", "contigs", "genes" ]
+		// [ meta, row.source, reads.collect({it -> file(it)}), row.contigs, row.genes ]
+		// [
+		// 	[id:SAMEA112490973, library_source:metaT, biome:marine, is_paired:true, library:paired, merged:true],
+		// 	prokaryote,
+		// 	[/scratch/schudoma/trectivity_survey_3/work/c8/504ea6dcd93b19062117974e157920/qc_reads/SAMEA112490973/SAMEA112490973_R1.fastq.gz, /scratch/schudoma/trectivity_survey_3/work/c8/504ea6dcd93b19062117974e157920/qc_reads/SAMEA112490973/SAMEA112490973_R2.fastq.gz], /g/bork6/schudoma/data_processing/trec/amr/input/assemblies/SAMEA112490973-assembled.fa.gz, /g/bork6/schudoma/data_processing/trec/amr/input/genes/SAMEA112490973.psa_megahit.prodigal.fna.gz, [/scratch/schudoma/trectivity_survey_3/work/00/569b561d09a100bdcb1cd621086d4d/fastq/SAMEA112490973/SAMEA112490973_R1.fastq.gz, /scratch/schudoma/trectivity_survey_3/work/00/569b561d09a100bdcb1cd621086d4d/fastq/SAMEA112490973/SAMEA112490973_R2.fastq.gz],
+		// 	/g/bork6/schudoma/data_processing/trec/amr/input/assemblies/SAMEA112490973-assembled.fa.gz,
+		// 	/g/bork6/schudoma/data_processing/trec/amr/input/genes/SAMEA112490973.psa_megahit.prodigal.fna.gz,
+		// 	[/scratch/schudoma/trectivity_survey_3/work/00/569b561d09a100bdcb1cd621086d4d/fastq/SAMEA112490973/SAMEA112490973_R1.fastq.gz, /scratch/schudoma/trectivity_survey_3/work/00/569b561d09a100bdcb1cd621086d4d/fastq/SAMEA112490973/SAMEA112490973_R2.fastq.gz]]
+		// ]
 		
 		prep_samples_ch.dump(pretty: true, tag: "prep_samples_ch")
 
