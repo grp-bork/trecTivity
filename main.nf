@@ -149,7 +149,7 @@ workflow {
 
 		assembly(
 			// [ sample_prep, sample_meta[1], reads, sample_meta[3], sample_meta[4], sample_meta[2] ]
-			prep_samples_ch.map { sample, source, reads, contigs, genes, _biome -> [ sample, source, reads, genome, genes ] },
+			prep_samples_ch.map { sample, source, reads, contigs, genes, _biome -> [ sample, source, reads, contigs, genes ] },
 			align_to_reference.out.alignments
 		)
 		
