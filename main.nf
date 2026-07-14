@@ -28,6 +28,9 @@ include { assembly } from "./trectivity/workflows/assembly"
 
 include { motus3; motus4 } from "./trectivity/modules/profilers/motus"
 
+include { profiling } from "./trectivity/workflows/profiling"
+
+
 if (params.input_dir && params.remote_input_dir) {
 	log.info """
 		Cannot process both --input_dir and --remote_input_dir. Please check input parameters.
@@ -142,25 +145,32 @@ workflow {
 				.collect()
 		)
 
-		if (params.run_gffquant) {
-			gq_input_ch = nevermore_main.out.fastqs
-				.map { sample, fastqs ->
-				sample_id = sample.id.replaceAll(/.(orphans|singles|chimeras)$/, "")
-				return [ sample_id, [fastqs].flatten() ]
-			}
-			.groupTuple(size: 2, remainder: true)
-			.map { sample_id, fastqs -> [ sample_id, [fastqs].flatten() ] }
-			.join(
-				prep_samples_ch.map { it -> [ it[0].id, it ] }, by: 0
+		if (params.run_gffquant || params.run_motus) {
+			profiling(
+				nevermore_main.out.fastqs,
+				prep_samples_ch
 			)
-			// .map { sample_id, fastqs, _sample, _source, _reads, _contigs, _genes, biome -> [ sample_id, fastqs, file("${params.gq_db}/${biome}/${biome}.mmi") ] }
-			// .map { sample_id, fastqs, sample_meta, _source, _reads, _contigs, _genes -> [ sample_id, fastqs, "${params.gq_db}/${sample_meta.biome}/${sample_meta.biome}.mmi" ] }
-			.map { sample_id, fastqs, sample_meta -> [ sample_id, fastqs, "${params.gq_db}/${sample_meta[0].biome}/${sample_meta[0].biome}.mmi" ] }
-			
-			gq_input_ch.dump(pretty: true, tag: "gq_input_ch")
-		
-			gffquant_flow(gq_input_ch)
 		}
+
+		// if (params.run_gffquant) {
+		// 	gq_input_ch = nevermore_main.out.fastqs
+		// 		.map { sample, fastqs ->
+		// 		sample_id = sample.id.replaceAll(/.(orphans|singles|chimeras)$/, "")
+		// 		return [ sample_id, [fastqs].flatten() ]
+		// 	}
+		// 	.groupTuple(size: 2, remainder: true)
+		// 	.map { sample_id, fastqs -> [ sample_id, [fastqs].flatten() ] }
+		// 	.join(
+		// 		prep_samples_ch.map { it -> [ it[0].id, it ] }, by: 0
+		// 	)
+		// 	// .map { sample_id, fastqs, _sample, _source, _reads, _contigs, _genes, biome -> [ sample_id, fastqs, file("${params.gq_db}/${biome}/${biome}.mmi") ] }
+		// 	// .map { sample_id, fastqs, sample_meta, _source, _reads, _contigs, _genes -> [ sample_id, fastqs, "${params.gq_db}/${sample_meta.biome}/${sample_meta.biome}.mmi" ] }
+		// 	.map { sample_id, fastqs, sample_meta -> [ sample_id, fastqs, "${params.gq_db}/${sample_meta[0].biome}/${sample_meta[0].biome}.mmi" ] }
+			
+		// 	gq_input_ch.dump(pretty: true, tag: "gq_input_ch")
+		
+		// 	gffquant_flow(gq_input_ch)
+		// }
 
 		assembly(
 			// [ sample_prep, sample_meta[1], reads, sample_meta[3], sample_meta[4], sample_meta[2] ]
@@ -168,17 +178,17 @@ workflow {
 			align_to_reference.out.alignments
 		)
 		
-		if (params.run_motus) {
-			def run_motus3 = (params.run_motus == "motus3" || params.run_motus == "both")
-			def run_motus4 = (params.run_motus == "motus4" || params.run_motus == "both")
-			if (run_motus3) {
-				motus3(nevermore_main.out.fastqs, params.motus3_db)
-			} 
-			if (run_motus4) {
-				motus4(nevermore_main.out.fastqs, params.motus4_db)
-			}
+		// if (params.run_motus) {
+		// 	def run_motus3 = (params.run_motus == "motus3" || params.run_motus == "both")
+		// 	def run_motus4 = (params.run_motus == "motus4" || params.run_motus == "both")
+		// 	if (run_motus3) {
+		// 		motus3(nevermore_main.out.fastqs, params.motus3_db)
+		// 	} 
+		// 	if (run_motus4) {
+		// 		motus4(nevermore_main.out.fastqs, params.motus4_db)
+		// 	}
 
-		}
+		// }
 
 		// motus(nevermore_main.out.fastqs, params.motus_db)
 		// motus_merge(
