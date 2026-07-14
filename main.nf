@@ -153,7 +153,7 @@ workflow {
 				prep_samples_ch.map { it -> [ it[0].id, it ] }, by: 0
 			)
 			// .map { sample_id, fastqs, _sample, _source, _reads, _contigs, _genes, biome -> [ sample_id, fastqs, file("${params.gq_db}/${biome}/${biome}.mmi") ] }
-			.map { sample_id, fastqs, _sample, _source, _reads, _contigs, _genes, biome -> [ sample_id, fastqs, "${params.gq_db}/${biome}/${biome}.mmi" ] }
+			.map { sample_id, fastqs, sample_meta, _source, _reads, _contigs, _genes, sample_meta.biome -> [ sample_id, fastqs, "${params.gq_db}/${biome}/${biome}.mmi" ] }
 			
 			gq_input_ch.dump(pretty: true, tag: "gq_input_ch")
 		
