@@ -106,8 +106,8 @@ workflow {
 					.map { sample, reads -> [ sample.id.replaceAll(/\.singles$/, ""), sample, reads ] },
 				by: 0
 			)
-			.map { sample_id, sample_raw, sample_prep, reads ->
-				return [ sample_prep, sample_raw[1], reads, sample_raw[3], sample_raw[4] ]
+			.map { sample_id, sample_meta, sample_prep, reads ->
+				return [ sample_prep, sample_meta[1], reads, sample_meta[3], sample_meta[4], sample_meta[2] ]
 			}
 		
 		prep_samples_ch.dump(pretty: true, tag: "prep_samples_ch")
@@ -132,18 +132,24 @@ workflow {
 			gq_input_ch = nevermore_main.out.fastqs
 				.map { sample, fastqs ->
 				sample_id = sample.id.replaceAll(/.(orphans|singles|chimeras)$/, "")
-				return [ sample_id, [fastqs].flatten(), sample.biome ]
+				return [ sample_id, [fastqs].flatten() ]
 			}
-			.groupTuple()
-			.map { sample_id, fastqs, biome -> return [ sample_id, [fastqs].flatten(), file("${params.gq_db}/${biome}/${biome}.mmi") ] }
-		
+			.groupTuple(size: 2, remainder: true)
+			.map { sample_id, fastqs -> [ sample_id, [fastqs].flatten() ] }
+			.join(
+				prep_samples_ch.map { it -> [ it[0].id, it ] }, by: 0
+			)
+			// .map { sample_id, fastqs, _sample, _source, _reads, _contigs, _genes, biome -> [ sample_id, fastqs, file("${params.gq_db}/${biome}/${biome}.mmi") ] }
+			.map { sample_id, fastqs, _sample, _source, _reads, _contigs, _genes, biome -> [ sample_id, fastqs, "${params.gq_db}/${biome}/${biome}.mmi" ] }
+			
 			gq_input_ch.dump(pretty: true, tag: "gq_input_ch")
 		
 			gffquant_flow(gq_input_ch)
 		}
 
 		assembly(
-			prep_samples_ch,
+			// [ sample_prep, sample_meta[1], reads, sample_meta[3], sample_meta[4], sample_meta[2] ]
+			prep_samples_ch.map { sample, source, reads, contigs, genes, _biome -> [ sample, source, reads, genome, genes ] },
 			align_to_reference.out.alignments
 		)
 		

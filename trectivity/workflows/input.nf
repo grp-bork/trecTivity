@@ -13,6 +13,7 @@ workflow handle_input {
 					def meta = [:]
 					meta.id = row.id
 					meta.library_source = "metaT"
+					meta.biome = row.biome
 					def reads = null
 					if (row.r1 != null && row.r2 != null) {
 						meta.is_paired = true
