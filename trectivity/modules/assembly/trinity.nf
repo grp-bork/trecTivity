@@ -69,6 +69,7 @@ process metaT_trinity {
 
 	Trinity --seqType fq --max_memory ${mem_gb}G ${input_string} --CPU ${task.cpus} --output trinity/
 
+	rm -rf trinity/read_partitions/
 	mv -v trinity/* ${outdir}/
 
 	"""
