@@ -143,7 +143,7 @@ process motus4 {
 
     export MOTUS_DB=\$(readlink ${motus_db})
 
-    motus profile -v 7 \
+    motus profile \
 	-t ${task.cpus} \
 	-n ${sample.id} \
 	-l ${params.motus_min_length} \
