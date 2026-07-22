@@ -8,11 +8,12 @@ workflow handle_input {
 		if (params.samplesheet) {
 			samples_ch = Channel
 				.fromPath(params.samplesheet)
-				.splitCsv(sep: '\t', header: [ "id", "source", "r1", "r2", "singles", "contigs", "genes" ])
+				.splitCsv(sep: '\t', header: [ "id", "source", "biome", "r1", "r2", "singles", "contigs", "genes" ])
 				.map { row -> 
 					def meta = [:]
 					meta.id = row.id
 					meta.library_source = "metaT"
+					meta.biome = row.biome
 					def reads = null
 					if (row.r1 != null && row.r2 != null) {
 						meta.is_paired = true

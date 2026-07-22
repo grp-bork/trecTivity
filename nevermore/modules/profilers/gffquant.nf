@@ -8,6 +8,7 @@ params.gq_restrict_metrics = "raw,lnorm,scaled,rpkm"
 
 
 process stream_gffquant {
+	container "ghcr.io/cschu/gff_quantifier:v2.18.5"
 	tag "gffquant.${sample}"
 	// publishDir "${params.output_dir}/profiles", mode: "copy", pattern: "*.{txt.gz,pd.txt}"
 	// publishDir "${params.output_dir}", mode: "copy", pattern: "logs/*.log"
@@ -15,8 +16,7 @@ process stream_gffquant {
 	label "large"
 
 	input:
-		tuple val(sample), path(fastqs)
-		path(gq_db)
+		tuple val(sample), path(fastqs), path(gq_db)
 
 	output:
 		tuple val(sample), path("${sample}/*.{txt.gz,pd.txt}"), emit: results
@@ -94,6 +94,7 @@ process stream_gffquant {
 }
 
 process run_gffquant {
+	container "ghcr.io/cschu/gff_quantifier:v2.18.5"
 	publishDir params.output_dir, mode: "copy"
 	label "gffquant"
 
