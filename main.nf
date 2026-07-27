@@ -111,7 +111,6 @@ workflow {
 				by: 0
 			)
 			.map { sample_id, sample_meta, sample_prep, reads ->
-				// return [ sample_prep, sample_meta[1], reads, sample_meta[3], sample_meta[4], sample_meta[2] ]
 				return [ sample_prep, sample_meta[1], reads, sample_meta[3], sample_meta[4] ]
 			}
 
@@ -145,68 +144,28 @@ workflow {
 				.collect()
 		)
 
-		if (params.run_gffquant || params.run_motus) {
+		if (params.run_profiling && (params.run_gffquant || params.run_motus)) {
 			profiling(
 				nevermore_main.out.fastqs,
 				prep_samples_ch
 			)
 		}
 
-		// if (params.run_gffquant) {
-		// 	gq_input_ch = nevermore_main.out.fastqs
-		// 		.map { sample, fastqs ->
-		// 		sample_id = sample.id.replaceAll(/.(orphans|singles|chimeras)$/, "")
-		// 		return [ sample_id, [fastqs].flatten() ]
-		// 	}
-		// 	.groupTuple(size: 2, remainder: true)
-		// 	.map { sample_id, fastqs -> [ sample_id, [fastqs].flatten() ] }
-		// 	.join(
-		// 		prep_samples_ch.map { it -> [ it[0].id, it ] }, by: 0
-		// 	)
-		// 	// .map { sample_id, fastqs, _sample, _source, _reads, _contigs, _genes, biome -> [ sample_id, fastqs, file("${params.gq_db}/${biome}/${biome}.mmi") ] }
-		// 	// .map { sample_id, fastqs, sample_meta, _source, _reads, _contigs, _genes -> [ sample_id, fastqs, "${params.gq_db}/${sample_meta.biome}/${sample_meta.biome}.mmi" ] }
-		// 	.map { sample_id, fastqs, sample_meta -> [ sample_id, fastqs, "${params.gq_db}/${sample_meta[0].biome}/${sample_meta[0].biome}.mmi" ] }
-			
-		// 	gq_input_ch.dump(pretty: true, tag: "gq_input_ch")
+		contigs_ch = genes_ch
+			.map { sample, fasta -> [ sample, "metaG", fasta ] }
+		if (params.run_assembly) {
+			assembly(
+				// [ sample_prep, sample_meta[1], reads, sample_meta[3], sample_meta[4], sample_meta[2] ]
+				prep_samples_ch, //.map { sample, source, reads, contigs, genes -> [ sample, source, reads, contigs, genes ] },
+				align_to_reference.out.alignments
+			)
+			contigs_ch = contigs_ch
+				.mix(assembly.out.contigs.map { sample, fasta -> [ sample, "assembled", fasta ] } )
+		}
 		
-		// 	gffquant_flow(gq_input_ch)
-		// }
-
-		assembly(
-			// [ sample_prep, sample_meta[1], reads, sample_meta[3], sample_meta[4], sample_meta[2] ]
-			prep_samples_ch, //.map { sample, source, reads, contigs, genes -> [ sample, source, reads, contigs, genes ] },
-			align_to_reference.out.alignments
-		)
-		
-		// if (params.run_motus) {
-		// 	def run_motus3 = (params.run_motus == "motus3" || params.run_motus == "both")
-		// 	def run_motus4 = (params.run_motus == "motus4" || params.run_motus == "both")
-		// 	if (run_motus3) {
-		// 		motus3(nevermore_main.out.fastqs, params.motus3_db)
-		// 	} 
-		// 	if (run_motus4) {
-		// 		motus4(nevermore_main.out.fastqs, params.motus4_db)
-		// 	}
-
-		// }
-
-		// motus(nevermore_main.out.fastqs, params.motus_db)
-		// motus_merge(
-		// 	motus.out.motus_profile
-		// 		.map { sample, profile -> return profile }
-		// 		.collect(),
-		// 	params.motus_db
-		// )
-
-		kallisto_flow(
-			genes_ch
-				.map { sample, fasta -> [ sample, "metaG", fasta ] }			
-				.mix(
-					// cd_hit_est.out.contigs.map { sample, fasta -> [ sample, "assembled", fasta ] }
-					assembly.out.contigs.map { sample, fasta -> [ sample, "assembled", fasta ] }
-				),
-			fastq_ch
-		)
+		if (params.run_quantification) {
+			kallisto_flow(contigs_ch, fastq_ch)
+		}
 
 		if (do_preprocessing && params.run_qa) {
 			collate_stats(counts_ch.collect())		
