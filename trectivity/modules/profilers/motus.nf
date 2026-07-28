@@ -153,14 +153,18 @@ process motus4 {
 	${input_files}
 
     # dbfile=${motus_db}/mOTUsv4.0.gtdb.taxonomy.80mv.tsv.gz
-    dbfile=\$(find ${motus_db} -name '*.80mv.tsv.gz')
-    head -n 1 ${sample.id}.motus4.txt > ${sample.id}/${sample.id}.motus4.txt
-    join -1 1 -2 1 <(zcat \$dbfile | head -n 1) <(head -n 2 ${sample.id}.motus4.txt | tail -n 1) | tr " " "\t" >> ${sample.id}/${sample.id}.motus4.txt
-    join -1 1 -2 1 <(zcat \$dbfile | tail -n +2) <(tail -n +3 ${sample.id}.motus4.txt | sed "s/ /@/g") | tr " " "\t" | sed "s/@/ /g" >> ${sample.id}/${sample.id}.motus4.txt
+    dbfile=\$(find ${motus_db} -name '*.80mv.tsv.gz' | head -n 1)
+    if [[ -f \$dbfile ]]; then
+        head -n 1 ${sample.id}.motus4.txt > ${sample.id}/${sample.id}.motus4.txt
+        join -1 1 -2 1 <(zcat \$dbfile | head -n 1) <(head -n 2 ${sample.id}.motus4.txt | tail -n 1) | tr " " "\t" >> ${sample.id}/${sample.id}.motus4.txt
+        join -1 1 -2 1 <(zcat \$dbfile | tail -n +2) <(tail -n +3 ${sample.id}.motus4.txt | sed "s/ /@/g") | tr " " "\t" | sed "s/@/ /g" >> ${sample.id}/${sample.id}.motus4.txt
 
-    head -n 1 ${sample.id}.motus4.txt.relab > ${sample.id}/${sample.id}.motus4.txt.relab
-    join -1 1 -2 1 <(zcat \$dbfile | head -n 1) <(head -n 2 ${sample.id}.motus4.txt.relab | tail -n 1) | tr " " "\t" >> ${sample.id}/${sample.id}.motus4.txt.relab
-    join -1 1 -2 1 <(zcat \$dbfile | tail -n +2) <(tail -n +3 ${sample.id}.motus4.txt.relab | sed "s/ /@/g") | tr " " "\t" | sed "s/@/ /g" >> ${sample.id}/${sample.id}.motus4.txt.relab
+        head -n 1 ${sample.id}.motus4.txt.relab > ${sample.id}/${sample.id}.motus4.txt.relab
+        join -1 1 -2 1 <(zcat \$dbfile | head -n 1) <(head -n 2 ${sample.id}.motus4.txt.relab | tail -n 1) | tr " " "\t" >> ${sample.id}/${sample.id}.motus4.txt.relab
+        join -1 1 -2 1 <(zcat \$dbfile | tail -n +2) <(tail -n +3 ${sample.id}.motus4.txt.relab | sed "s/ /@/g") | tr " " "\t" | sed "s/@/ /g" >> ${sample.id}/${sample.id}.motus4.txt.relab
+    else
+        echo NO_TAXONOMY_DATA_FOUND > ${sample.id}/${sample.id}.motus4.txt.relab
+    fi    
 
     touch MOTUS4_DONE_SENTINEL
     """
