@@ -48,6 +48,15 @@ workflow assembly {
 
 		metaT_trinity(assembly_input_ch, "stage1")
 
+		velvet_input_ch = assembly_input_ch
+			.map { meta, fastqs -> [ meta.sample_id, meta, fastqs ] }
+			.join(
+				isizes_ch.map { meta, ihist -> [ meta.id, ihist.text.split("\n")[1].split("\t")[1] ] },
+				by: 0
+			)
+			.map { meta.id, meta, fastqs, isize -> [ meta, fastqs, isize ] }
+
+		metaT_velvet(velvet_input_ch, "stage1")
 		// metaT_velvet(
 		// 	assembly_input_ch
 		// 		.map { meta, fastqs -> [ meta.sample_id, meta, fastqs ] }
