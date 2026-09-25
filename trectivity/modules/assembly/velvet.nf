@@ -51,7 +51,8 @@ process metaT_velvetoptimiser {
 		-x ${params.velveth_kstep} \
 		-d ${outdir} \
 		-p ${sample.id} \
-		-o '-ins_length ${insert_size} -read_trkg yes'
+		-o '-ins_length ${insert_size} -read_trkg yes' \
+		-a
 
 	"""
 
