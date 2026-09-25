@@ -152,6 +152,7 @@ workflow {
 		contigs_ch = genes_ch
 			.map { sample, fasta -> [ sample, "metaG", fasta ] }
 		if (params.run_assembly) {
+			qc_bbmerge_insert_size.out.isize_hist.dump(pretty: true, tag: "isizes_ch2")
 			assembly(
 				// [ sample_prep, sample_meta[1], reads, sample_meta[3], sample_meta[4], sample_meta[2] ]
 				prep_samples_ch, //.map { sample, source, reads, contigs, genes -> [ sample, source, reads, contigs, genes ] },
