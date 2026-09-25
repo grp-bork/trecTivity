@@ -48,6 +48,8 @@ workflow assembly {
 
 		metaT_trinity(assembly_input_ch, "stage1")
 
+		isizes_ch.dump(pretty: true, tag: "isizes_ch")
+
 		velvet_input_ch = assembly_input_ch
 			.map { meta, fastqs -> [ meta.sample_id, meta, fastqs ] }
 			.join(
