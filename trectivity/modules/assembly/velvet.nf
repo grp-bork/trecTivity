@@ -45,6 +45,7 @@ process metaT_velvetoptimiser {
 	"""
 	VelvetOptimiser.pl \
 		-t 2 \
+		-v \
 		-f '${input_files}' \
 		-s ${params.velveth_kmin} \
 		-e ${params.velveth_kmax} \
