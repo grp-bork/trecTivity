@@ -1,7 +1,7 @@
 include { stringtie; extract_stringtie_transcripts } from "../modules/assembly/stringtie"
 include { metaT_megahit; bwa_index; bwa2assembly } from "../modules/assembly/megahit"
 include { metaT_trinity } from "../modules/assembly/trinity"
-include { metaT_velvet } from "../modules/assembly/velvet"
+include { metaT_velvet; metaT_velvetoptimiser } from "../modules/assembly/velvet"
 include { cd_hit_est } from "../modules/assembly/cdhit"
 include { quast } from "../modules/assembly/quast"
 
@@ -58,7 +58,7 @@ workflow assembly {
 			)
 			.map { meta_id, meta, fastqs, isize -> [ meta, fastqs, isize ] }
 
-		metaT_velvet(velvet_input_ch, "stage1")
+		metaT_velvetoptimiser(velvet_input_ch, "stage1")
 		// metaT_velvet(
 		// 	assembly_input_ch
 		// 		.map { meta, fastqs -> [ meta.sample_id, meta, fastqs ] }
