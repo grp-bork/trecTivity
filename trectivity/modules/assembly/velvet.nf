@@ -1,4 +1,8 @@
 params.velvet_hash_length = "25,97,4"
+params.velveth_kmin = 25
+params.velveth_kmax = 97
+params.velveth_kstep = 4
+
 
 
 process metaT_velvetoptimiser {
