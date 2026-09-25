@@ -1,6 +1,6 @@
 params.velvet_hash_length = "25,97,4"
 
-process velvet {
+process metaT_velvet {
 	container "docker://quay.io/biocontainers/velvet:1.2.10--h577a1d6_9"
 	label "megahit"
 
