@@ -44,7 +44,7 @@ process metaT_velvetoptimiser {
 
 	"""
 	VelvetOptimiser.pl \
-		-t ${task.cpus} \
+		-t 2 \
 		-f '${input_files}' \
 		-s ${params.velveth_kmin} \
 		-e ${params.velveth_kmax} \
