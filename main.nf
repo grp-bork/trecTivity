@@ -44,8 +44,6 @@ if (params.input_dir && params.remote_input_dir) {
 }
 
 def input_dir = (params.input_dir) ? params.input_dir : params.remote_input_dir
-def do_alignment = params.run_gffquant || !params.skip_alignment
-def do_stream = params.gq_stream
 def do_preprocessing = (!params.skip_preprocessing || params.run_preprocessing)
 
 
@@ -157,7 +155,8 @@ workflow {
 			assembly(
 				// [ sample_prep, sample_meta[1], reads, sample_meta[3], sample_meta[4], sample_meta[2] ]
 				prep_samples_ch, //.map { sample, source, reads, contigs, genes -> [ sample, source, reads, contigs, genes ] },
-				align_to_reference.out.alignments
+				align_to_reference.out.alignments,
+				qc_bbmerge_insert_size.out.isize_hist
 			)
 			contigs_ch = contigs_ch
 				.mix(assembly.out.contigs.map { sample, fasta -> [ sample, "assembled", fasta ] } )

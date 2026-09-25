@@ -9,6 +9,7 @@ workflow assembly {
 	take:
 		prep_samples_ch
 		alignments_ch
+		isizes_ch
 
 	main:
 
@@ -45,6 +46,17 @@ workflow assembly {
 		metaT_megahit(assembly_input_ch, "stage1")
 
 		metaT_trinity(assembly_input_ch, "stage1")
+
+		metaT_velvet(
+			assembly_input_ch
+				.map { meta, fastqs -> [ meta.id, meta, fastqs ] }
+				.join(
+					isizes_ch.map { meta, ihist -> [ meta.id, meta, ihist.text.split("\n")[1].replaceAll(/^#Median\s+/, "") ] },
+					by: 0
+				)
+				.map { meta.id, meta, fastqs, isize -> [ meta, fastqs, isize ] },
+			"stage1"
+		)
 
 		quast(metaT_megahit.out.contigs.mix(metaT_trinity.out.contigs))
 
