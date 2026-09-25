@@ -54,7 +54,7 @@ workflow assembly {
 				isizes_ch.map { meta, ihist -> [ meta.id, ihist.text.split("\n")[1].split("\t")[1] ] },
 				by: 0
 			)
-			.map { meta.id, meta, fastqs, isize -> [ meta, fastqs, isize ] }
+			.map { meta_id, meta, fastqs, isize -> [ meta, fastqs, isize ] }
 
 		metaT_velvet(velvet_input_ch, "stage1")
 		// metaT_velvet(
