@@ -1,6 +1,7 @@
 include { stringtie; extract_stringtie_transcripts } from "../modules/assembly/stringtie"
 include { metaT_megahit; bwa_index; bwa2assembly } from "../modules/assembly/megahit"
 include { metaT_trinity } from "../modules/assembly/trinity"
+include { metaT_velvet } from "../modules/assembly/velvet"
 include { cd_hit_est } from "../modules/assembly/cdhit"
 include { quast } from "../modules/assembly/quast"
 
