@@ -51,7 +51,7 @@ workflow assembly {
 		isizes_ch.dump(pretty: true, tag: "isizes_ch")
 
 		velvet_input_ch = assembly_input_ch
-			.map { meta, fastqs -> [ meta.sample_id, meta, fastqs ] }
+			.map { meta, fastqs -> [ meta.id, meta, fastqs ] }
 			.join(
 				isizes_ch.map { meta, ihist -> [ meta.id, ihist.text.split("\n")[1].split("\t")[1] ] },
 				by: 0
