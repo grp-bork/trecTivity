@@ -50,9 +50,9 @@ workflow assembly {
 
 		metaT_velvet(
 			assembly_input_ch
-				.map { meta, fastqs -> [ meta.id, meta, fastqs ] }
+				.map { meta, fastqs -> [ meta.sample_id, meta, fastqs ] }
 				.join(
-					isizes_ch.map { meta, ihist -> [ meta.id, meta, ihist.text.split("\n")[1].replaceAll(/^#Median\s+/, "") ] },
+					isizes_ch.map { meta, ihist -> [ meta.id, meta, ihist.text.split("\n")[1].split("\t")[1] ] },
 					by: 0
 				)
 				.map { meta.id, meta, fastqs, isize -> [ meta, fastqs, isize ] },
