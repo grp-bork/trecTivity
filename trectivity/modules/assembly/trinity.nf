@@ -7,7 +7,9 @@ process metaT_trinity {
 	val(stage)
 
 	output:
-	tuple val(sample), path("assemblies/metaT_trinity/${stage}/${sample.library_source}/${sample.id}/*.fasta"), emit: contigs
+	// tuple val(sample), path("assemblies/metaT_trinity/${stage}/${sample.library_source}/${sample.id}/*.fasta"), emit: contigs
+	tuple val(sample), path("trinity.Trinity.fasta"), emit: contigs
+	tuple val(sample), path("trinity.Trinity.fasta.gene_trans_map"), emit: gene_trans_map
 
 	script:
 	def mem_gb = task.memory.toGiga()
