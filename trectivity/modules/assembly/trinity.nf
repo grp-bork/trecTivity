@@ -8,8 +8,9 @@ process metaT_trinity {
 
 	output:
 	// tuple val(sample), path("assemblies/metaT_trinity/${stage}/${sample.library_source}/${sample.id}/*.fasta"), emit: contigs
-	tuple val(sample), path("trinity.Trinity.fasta"), emit: contigs
-	tuple val(sample), path("trinity.Trinity.fasta.gene_trans_map"), emit: gene_trans_map
+	tuple val(sample), path("${outdir}/${sample.id}.trinity.fasta"), emit: contigs
+	tuple val(sample), path("${outdir}/${sample.id}.trinity.fasta.gene_trans_map"), emit: gene_trans_map
+	tuple val(sample), path("${outdir}/${sample.id}.trinity.salmon.quant.sf"), emit: salmon_quant
 
 	script:
 	def mem_gb = task.memory.toGiga()
@@ -52,15 +53,16 @@ process metaT_trinity {
 
 		input_string = "--single ${r1_files[0]}"
 		
-	} else if (r1_files.size() != 0) {
+	} else if (r2_files.size() != 0) {
 
 		input_string = "--single ${r2_files[0]}"
 		
-	} else if (r2_files.size() != 0) {
+	} else if (orphans.size() != 0) {
 
 		input_string = "--single ${orphans[0]}"
 
 	}
+
 	def outdir = "assemblies/metaT_trinity/${stage}/${sample.library_source}/${sample.id}"
 	
 	"""
@@ -71,9 +73,12 @@ process metaT_trinity {
 
 	Trinity --seqType fq --max_memory ${mem_gb}G ${input_string} --CPU ${task.cpus} --output trinity/
 
-	rm -rf trinity/read_partitions/
-	mv -v trinity/* ${outdir}/
+	mv -v trinity.Trinity.fasta ${outdir}/${sample.id}.trinity.fasta
+	mv -v trinity.Trinity.fasta.gene_trans_map ${outdir}/${sample.id}.trinity.fasta.gene_trans_map
+	mv -v trinity/salmon_outdir/quant.sf ${outdir}/${sample.id}.trinity.salmon.quant.sf
 
+	rm -f left.fastq right.fastq
+	rm -rf trinity/
 	"""
 	// cp -v megahit_out/final.contigs.fa ${outdir}/${sample.id}.${stage}.transcripts.fasta
 	
