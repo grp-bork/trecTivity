@@ -8,9 +8,9 @@ process metaT_trinity {
 
 	output:
 	// tuple val(sample), path("assemblies/metaT_trinity/${stage}/${sample.library_source}/${sample.id}/*.fasta"), emit: contigs
-	tuple val(sample), path("${outdir}/${sample.id}.trinity.fasta"), emit: contigs
-	tuple val(sample), path("${outdir}/${sample.id}.trinity.fasta.gene_trans_map"), emit: gene_trans_map
-	tuple val(sample), path("${outdir}/${sample.id}.trinity.salmon.quant.sf"), emit: salmon_quant
+	tuple val(sample), path("assemblies/metaT_trinity/${stage}/${sample.library_source}/${sample.id}/${sample.id}.trinity.fasta"), emit: contigs
+	tuple val(sample), path("assemblies/metaT_trinity/${stage}/${sample.library_source}/${sample.id}/${sample.id}.trinity.fasta.gene_trans_map"), emit: gene_trans_map
+	tuple val(sample), path("assemblies/metaT_trinity/${stage}/${sample.library_source}/${sample.id}/${sample.id}.trinity.salmon.quant.sf"), emit: salmon_quant
 
 	script:
 	def mem_gb = task.memory.toGiga()
