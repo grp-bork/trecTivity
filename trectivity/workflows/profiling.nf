@@ -33,6 +33,14 @@ workflow profiling {
 	}
 
 	if (params.run_motus) {
+		// motus(nevermore_main.out.fastqs, params.motus_db)
+		// motus_merge(
+		// 	motus.out.motus_profile
+		// 		.map { sample, profile -> return profile }
+		// 		.collect(),
+		// 	params.motus_db
+		// )
+
 		def run_motus3 = (params.run_motus == "motus3" || params.run_motus == "both")
 		def run_motus4 = (params.run_motus == "motus4" || params.run_motus == "both")
 
