@@ -49,11 +49,12 @@ workflow assembly {
 
 		metaT_rnaspades(assembly_input_ch, "stage1")
 
-		// quast(metaT_megahit.out.contigs.mix(metaT_trinity.out.contigs))
+		quast(metaT_megahit.out.contigs.mix(metaT_rnaspades.out.contigs))
 
 		cd_hit_est(
 			metaT_megahit.out.contigs
 				// .mix(metaT_trinity.out.contigs)
+				.mix(metaT_rnaspades.out.contigs)
 				.mix(extract_stringtie_transcripts.out.transcripts)
 				.map { sample, file -> [ sample.id, sample, file ] }
 				.groupTuple(by: 0, size: 3)

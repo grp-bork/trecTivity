@@ -9,7 +9,7 @@ process metaT_rnaspades {
 	val(stage)
 
 	output:
-	tuple val(sample), path("assemblies/metaT_rnaspades/${stage}/${sample.library_source}/${sample.id}/${sample.id}.${stage}.transcripts.fasta"), emit: transcripts
+	tuple val(sample), path("assemblies/metaT_rnaspades/${stage}/${sample.library_source}/${sample.id}/${sample.id}.${stage}.transcripts.fasta"), emit: contigs
 
 	script:
 	def mem_gb = task.memory.toGiga()
