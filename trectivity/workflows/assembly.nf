@@ -44,7 +44,9 @@ workflow assembly {
 
 		metaT_megahit(assembly_input_ch, "stage1")
 
-		metaT_trinity(assembly_input_ch, "stage1")
+		// metaT_trinity(assembly_input_ch, "stage1")
+
+		metaT_rnaspades(assembly_input_ch, "stage1")
 
 		quast(metaT_megahit.out.contigs.mix(metaT_trinity.out.contigs))
 
