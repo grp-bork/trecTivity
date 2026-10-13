@@ -49,7 +49,7 @@ workflow assembly {
 
 		metaT_rnaspades(assembly_input_ch, "stage1")
 
-		quast(metaT_megahit.out.contigs.mix(metaT_trinity.out.contigs))
+		// quast(metaT_megahit.out.contigs.mix(metaT_trinity.out.contigs))
 
 		cd_hit_est(
 			metaT_megahit.out.contigs
