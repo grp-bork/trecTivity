@@ -37,7 +37,7 @@ process metaT_rnaspades {
 	"""
 	rnaspades.py -t ${task.cpus} -k ${params.kmer_steps} -o ${outdir} ${input_files}
 
-	mv -v ${outdir}/transcripts.fasta ${outdir}/${sample.id}.${stage}.transcripts.fasta
+	mv -v ${outdir}/transcripts.fasta ${outdir}/${sample.id}.${stage}.rnaspades.transcripts.fasta
 	"""
 
 
