@@ -1,6 +1,7 @@
 include { stringtie; extract_stringtie_transcripts } from "../modules/assembly/stringtie"
 include { metaT_megahit; bwa_index; bwa2assembly } from "../modules/assembly/megahit"
 include { metaT_trinity } from "../modules/assembly/trinity"
+include { metaT_rnaspades } from "../modules/assembly/rnaspades"
 include { cd_hit_est } from "../modules/assembly/cdhit"
 include { quast } from "../modules/assembly/quast"
 
@@ -44,13 +45,16 @@ workflow assembly {
 
 		metaT_megahit(assembly_input_ch, "stage1")
 
-		metaT_trinity(assembly_input_ch, "stage1")
+		// metaT_trinity(assembly_input_ch, "stage1")
 
-		quast(metaT_megahit.out.contigs.mix(metaT_trinity.out.contigs))
+		metaT_rnaspades(assembly_input_ch, "stage1")
+
+		quast(metaT_megahit.out.contigs.mix(metaT_rnaspades.out.contigs))
 
 		cd_hit_est(
 			metaT_megahit.out.contigs
-				.mix(metaT_trinity.out.contigs)
+				// .mix(metaT_trinity.out.contigs)
+				.mix(metaT_rnaspades.out.contigs)
 				.mix(extract_stringtie_transcripts.out.transcripts)
 				.map { sample, file -> [ sample.id, sample, file ] }
 				.groupTuple(by: 0, size: 3)
