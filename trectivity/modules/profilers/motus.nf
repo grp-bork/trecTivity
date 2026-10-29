@@ -107,7 +107,7 @@ process motus3 {
 
 
 process motus4 {
-    container "registry.git.embl.org/schudoma/motus4-docker:latest"
+    container "ghcr.io/cschu/motus4-docker:main"
 
     input:
     tuple val(sample), path(fastqs)
